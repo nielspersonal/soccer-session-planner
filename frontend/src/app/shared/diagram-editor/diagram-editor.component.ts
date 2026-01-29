@@ -159,7 +159,6 @@ export class DiagramEditorComponent implements OnInit, OnChanges, AfterViewInit,
   ngOnChanges(changes: SimpleChanges) {
     if (changes['initialData'] && !changes['initialData'].firstChange && this.layer) {
       // Reload diagram when initialData changes (e.g., when editing existing drill)
-      console.log('InitialData changed, reloading diagram:', changes['initialData'].currentValue);
       this.background = changes['initialData'].currentValue?.background || 'half-pitch';
       this.layer.destroyChildren();
       this.layer.add(this.transformer);
