@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { DrillService } from '../../../core/services/drill.service';
+import { DiagramEditorComponent } from '../../../shared/diagram-editor/diagram-editor.component';
 
 @Component({
   selector: 'app-drill-form',
@@ -19,7 +20,8 @@ import { DrillService } from '../../../core/services/drill.service';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatChipsModule
+    MatChipsModule,
+    DiagramEditorComponent
   ],
   template: `
     <div class="container">
@@ -54,9 +56,12 @@ import { DrillService } from '../../../core/services/drill.service';
               <textarea matInput formControlName="notes" rows="4"></textarea>
             </mat-form-field>
 
-            <div class="diagram-placeholder">
-              <p>Diagram Editor Component Would Go Here</p>
-              <p>Features: Canvas with Konva.js, add players, cones, balls, arrows, zones</p>
+            <div class="diagram-section">
+              <h3>Drill Diagram</h3>
+              <app-diagram-editor 
+                [initialData]="drillForm.get('diagramJson')?.value"
+                (diagramChange)="onDiagramChange($event)">
+              </app-diagram-editor>
             </div>
 
             <div class="actions">
@@ -74,12 +79,12 @@ import { DrillService } from '../../../core/services/drill.service';
     mat-form-field {
       margin-bottom: 16px;
     }
-    .diagram-placeholder {
-      border: 2px dashed #ccc;
-      padding: 40px;
-      text-align: center;
-      margin: 20px 0;
-      background: #f5f5f5;
+    .diagram-section {
+      margin: 24px 0;
+    }
+    .diagram-section h3 {
+      margin-bottom: 12px;
+      color: #333;
     }
     .actions {
       display: flex;
@@ -141,5 +146,11 @@ export class DrillFormComponent implements OnInit {
 
   cancel() {
     this.router.navigate(['/drills']);
+  }
+
+  onDiagramChange(diagramData: any) {
+    this.drillForm.patchValue({
+      diagramJson: diagramData
+    });
   }
 }
