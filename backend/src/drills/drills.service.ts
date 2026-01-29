@@ -7,7 +7,10 @@ export class DrillsService {
   constructor(private prisma: PrismaService) {}
 
   async create(userId: number, dto: CreateDrillDto) {
-    return this.prisma.drill.create({
+    console.log('Backend received drill data:', dto);
+    console.log('DiagramJson received:', dto.diagramJson);
+    
+    const result = await this.prisma.drill.create({
       data: {
         userId,
         title: dto.title,
@@ -19,6 +22,10 @@ export class DrillsService {
         diagramJson: dto.diagramJson,
       },
     });
+    
+    console.log('Drill created with ID:', result.id);
+    console.log('Saved diagramJson:', result.diagramJson);
+    return result;
   }
 
   async findAll(userId: number) {
