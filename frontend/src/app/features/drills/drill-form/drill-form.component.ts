@@ -131,6 +131,8 @@ export class DrillFormComponent implements OnInit {
   onSubmit() {
     if (this.drillForm.valid) {
       const drillData = this.drillForm.value;
+      console.log('Submitting drill data:', drillData);
+      console.log('DiagramJson in submission:', drillData.diagramJson);
 
       if (this.isEditMode && this.drillId) {
         this.drillService.update(this.drillId, drillData as any).subscribe(() => {
@@ -149,8 +151,10 @@ export class DrillFormComponent implements OnInit {
   }
 
   onDiagramChange(diagramData: any) {
+    console.log('Diagram changed:', diagramData);
     this.drillForm.patchValue({
       diagramJson: diagramData
     });
+    console.log('Form value after patch:', this.drillForm.value.diagramJson);
   }
 }
