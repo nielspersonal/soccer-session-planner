@@ -218,7 +218,9 @@ export class DiagramEditorComponent implements OnInit, AfterViewInit, OnDestroy 
     });
 
     this.stage.on('mousedown touchstart', (e) => {
-      if (e.target !== this.stage) return;
+      // Allow clicks on stage or background layer
+      const isBackgroundClick = e.target === this.stage || e.target.getLayer() === this.backgroundLayer;
+      if (!isBackgroundClick) return;
 
       const pos = this.stage.getPointerPosition();
       if (!pos) return;
