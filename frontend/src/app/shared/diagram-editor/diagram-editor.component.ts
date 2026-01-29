@@ -197,6 +197,7 @@ export class DiagramEditorComponent implements OnInit, AfterViewInit, OnDestroy 
     this.layer.add(this.transformer);
 
     this.drawBackground();
+    this.backgroundLayer.draw(); // Force immediate draw
     this.setupEventListeners();
     this.saveState();
   }
@@ -549,6 +550,7 @@ export class DiagramEditorComponent implements OnInit, AfterViewInit, OnDestroy 
 
   onBackgroundChange() {
     this.drawBackground();
+    this.backgroundLayer.draw();
     this.emitChange();
   }
 
