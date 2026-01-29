@@ -8,9 +8,9 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791.svg)](https://www.postgresql.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## 🚀 Quick Start
+## 🚀 Quick Start __
 
-```bash
+```bash 
 # 1. Clone the repository
 git clone https://github.com/nielspersonal/soccer-session-planner.git
 cd soccer-session-planner
