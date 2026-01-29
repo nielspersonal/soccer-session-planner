@@ -30,7 +30,8 @@ export interface DiagramObject {
   template: `
     <div class="diagram-editor">
       <!-- Toolbar -->
-      <div class="toolbar">
+      @if (!readOnly) {
+        <div class="toolbar">
         <mat-button-toggle-group [(value)]="selectedTool" (change)="onToolChange()">
           <mat-button-toggle value="select" matTooltip="Select/Move">
             <mat-icon>pan_tool</mat-icon>
@@ -77,7 +78,8 @@ export interface DiagramObject {
             <mat-button-toggle value="full-pitch" matTooltip="Full Pitch">Full</mat-button-toggle>
           </mat-button-toggle-group>
         </div>
-      </div>
+        </div>
+      }
 
       <!-- Canvas Container -->
       <div class="canvas-container">
@@ -130,6 +132,7 @@ export interface DiagramObject {
 export class DiagramEditorComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   @ViewChild('container', { static: false }) containerRef!: ElementRef<HTMLDivElement>;
   @Input() initialData?: any;
+  @Input() readOnly = false;
   @Output() diagramChange = new EventEmitter<any>();
 
   private cdr = inject(ChangeDetectorRef);

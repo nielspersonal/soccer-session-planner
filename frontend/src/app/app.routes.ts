@@ -36,9 +36,14 @@ export const routes: Routes = [
     loadComponent: () => import('./features/sessions/session-form/session-form.component').then(m => m.SessionFormComponent)
   },
   {
-    path: 'sessions/:id',
+    path: 'sessions/:id/edit',
     canActivate: [authGuard],
     loadComponent: () => import('./features/sessions/session-form/session-form.component').then(m => m.SessionFormComponent)
+  },
+  {
+    path: 'sessions/:id',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/sessions/session-detail/session-detail.component').then(m => m.SessionDetailComponent)
   },
   {
     path: '',

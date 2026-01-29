@@ -229,7 +229,7 @@ export class SessionFormComponent implements OnInit {
       } else {
         this.sessionService.create(sessionData as any).subscribe((session) => {
           // After creating, redirect to edit mode to add drills
-          this.router.navigate(['/sessions', session.id]);
+          this.router.navigate(['/sessions', session.id, 'edit']);
         });
       }
     }
