@@ -527,7 +527,9 @@ export class DiagramEditorComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   onToolChange() {
-    this.transformer.nodes([]);
+    if (this.transformer) {
+      this.transformer.nodes([]);
+    }
   }
 
   onBackgroundChange() {
@@ -536,6 +538,7 @@ export class DiagramEditorComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   deleteSelected() {
+    if (!this.transformer) return;
     const selected = this.transformer.nodes();
     selected.forEach(node => node.destroy());
     this.transformer.nodes([]);
@@ -544,6 +547,7 @@ export class DiagramEditorComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   clear() {
+    if (!this.layer) return;
     if (confirm('Clear all objects?')) {
       this.layer.destroyChildren();
       this.layer.add(this.transformer);
@@ -575,7 +579,7 @@ export class DiagramEditorComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   hasSelection(): boolean {
-    return this.transformer.nodes().length > 0;
+    return this.transformer?.nodes()?.length > 0;
   }
 
   private saveState() {
