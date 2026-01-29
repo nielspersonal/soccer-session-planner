@@ -185,7 +185,9 @@ export class DiagramEditorComponent implements OnInit, AfterViewInit, OnDestroy 
       height: height,
     });
 
-    this.backgroundLayer = new Konva.Layer();
+    this.backgroundLayer = new Konva.Layer({
+      listening: false // Background should not intercept events
+    });
     this.layer = new Konva.Layer();
     this.stage.add(this.backgroundLayer);
     this.stage.add(this.layer);
@@ -218,9 +220,8 @@ export class DiagramEditorComponent implements OnInit, AfterViewInit, OnDestroy 
     });
 
     this.stage.on('mousedown touchstart', (e) => {
-      // Allow clicks on stage or background layer
-      const isBackgroundClick = e.target === this.stage || e.target.getLayer() === this.backgroundLayer;
-      if (!isBackgroundClick) return;
+      // Only add objects when clicking on empty stage (background doesn't listen)
+      if (e.target !== this.stage) return;
 
       const pos = this.stage.getPointerPosition();
       if (!pos) return;
