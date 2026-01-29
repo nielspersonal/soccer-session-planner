@@ -462,48 +462,64 @@ export class DiagramEditorComponent implements OnInit, AfterViewInit, OnDestroy 
     });
     this.backgroundLayer.add(bg);
 
+    const pitchWidth = width - 100;
+    const pitchHeight = height - 100;
+
     // Pitch outline
     const outline = new Konva.Rect({
       x: 50,
       y: 50,
-      width: width - 100,
-      height: height - 100,
+      width: pitchWidth,
+      height: pitchHeight,
       stroke: 'white',
       strokeWidth: 3,
     });
     this.backgroundLayer.add(outline);
 
-    // Center circle
+    // Center circle (at bottom for half pitch)
     const centerCircle = new Konva.Circle({
       x: width / 2,
       y: height - 50,
-      radius: 60,
+      radius: 50,
       stroke: 'white',
       strokeWidth: 3,
     });
     this.backgroundLayer.add(centerCircle);
 
-    // Penalty area
+    // Penalty area (18-yard box) - more proportional
+    const penaltyWidth = pitchWidth * 0.5; // 50% of pitch width
+    const penaltyHeight = pitchHeight * 0.35; // 35% of pitch height
     const penaltyArea = new Konva.Rect({
-      x: width / 2 - 100,
+      x: width / 2 - penaltyWidth / 2,
       y: 50,
-      width: 200,
-      height: 120,
+      width: penaltyWidth,
+      height: penaltyHeight,
       stroke: 'white',
       strokeWidth: 3,
     });
     this.backgroundLayer.add(penaltyArea);
 
-    // Goal area
+    // Goal area (6-yard box) - more proportional
+    const goalWidth = pitchWidth * 0.25; // 25% of pitch width
+    const goalHeight = pitchHeight * 0.15; // 15% of pitch height
     const goalArea = new Konva.Rect({
-      x: width / 2 - 50,
+      x: width / 2 - goalWidth / 2,
       y: 50,
-      width: 100,
-      height: 50,
+      width: goalWidth,
+      height: goalHeight,
       stroke: 'white',
       strokeWidth: 3,
     });
     this.backgroundLayer.add(goalArea);
+
+    // Penalty spot
+    const penaltySpot = new Konva.Circle({
+      x: width / 2,
+      y: 50 + penaltyHeight * 0.65,
+      radius: 3,
+      fill: 'white',
+    });
+    this.backgroundLayer.add(penaltySpot);
   }
 
   private drawFullPitch(width: number, height: number) {
@@ -514,12 +530,15 @@ export class DiagramEditorComponent implements OnInit, AfterViewInit, OnDestroy 
     });
     this.backgroundLayer.add(bg);
 
+    const pitchWidth = width - 100;
+    const pitchHeight = height - 100;
+
     // Pitch outline
     const outline = new Konva.Rect({
       x: 50,
       y: 50,
-      width: width - 100,
-      height: height - 100,
+      width: pitchWidth,
+      height: pitchHeight,
       stroke: 'white',
       strokeWidth: 3,
     });
@@ -537,11 +556,68 @@ export class DiagramEditorComponent implements OnInit, AfterViewInit, OnDestroy 
     const centerCircle = new Konva.Circle({
       x: width / 2,
       y: height / 2,
-      radius: 60,
+      radius: 50,
       stroke: 'white',
       strokeWidth: 3,
     });
     this.backgroundLayer.add(centerCircle);
+
+    // Center spot
+    const centerSpot = new Konva.Circle({
+      x: width / 2,
+      y: height / 2,
+      radius: 3,
+      fill: 'white',
+    });
+    this.backgroundLayer.add(centerSpot);
+
+    // Top penalty area
+    const penaltyWidth = pitchWidth * 0.5;
+    const penaltyHeight = pitchHeight * 0.25;
+    const topPenaltyArea = new Konva.Rect({
+      x: width / 2 - penaltyWidth / 2,
+      y: 50,
+      width: penaltyWidth,
+      height: penaltyHeight,
+      stroke: 'white',
+      strokeWidth: 3,
+    });
+    this.backgroundLayer.add(topPenaltyArea);
+
+    // Bottom penalty area
+    const bottomPenaltyArea = new Konva.Rect({
+      x: width / 2 - penaltyWidth / 2,
+      y: height - 50 - penaltyHeight,
+      width: penaltyWidth,
+      height: penaltyHeight,
+      stroke: 'white',
+      strokeWidth: 3,
+    });
+    this.backgroundLayer.add(bottomPenaltyArea);
+
+    // Top goal area
+    const goalWidth = pitchWidth * 0.25;
+    const goalHeight = pitchHeight * 0.12;
+    const topGoalArea = new Konva.Rect({
+      x: width / 2 - goalWidth / 2,
+      y: 50,
+      width: goalWidth,
+      height: goalHeight,
+      stroke: 'white',
+      strokeWidth: 3,
+    });
+    this.backgroundLayer.add(topGoalArea);
+
+    // Bottom goal area
+    const bottomGoalArea = new Konva.Rect({
+      x: width / 2 - goalWidth / 2,
+      y: height - 50 - goalHeight,
+      width: goalWidth,
+      height: goalHeight,
+      stroke: 'white',
+      strokeWidth: 3,
+    });
+    this.backgroundLayer.add(bottomGoalArea);
   }
 
   onToolChange() {
