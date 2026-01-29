@@ -1,0 +1,27 @@
+{
+  "name": "soccer-session-planner",
+  "version": "1.0.0",
+  "description": "Soccer Session Planner - Full stack app for coaches",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\" --names \"API,WEB\" --prefix-colors \"blue,magenta\"",
+    "dev:backend": "cd backend && npm run start:dev",
+    "dev:frontend": "cd frontend && npm start",
+    "setup": "npm run setup:db && npm run setup:seed",
+    "setup:db": "cd backend && npx prisma migrate dev --name init && npx prisma generate",
+    "setup:seed": "cd backend && npm run prisma:seed",
+    "db:start": "docker compose up -d postgres",
+    "db:stop": "docker compose stop postgres",
+    "db:reset": "cd backend && npx prisma migrate reset --force",
+    "prebuild": "rimraf dist",
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "start": "node backend/dist/main.js"
+  },
+  "keywords": ["soccer", "coaching", "session-planner"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

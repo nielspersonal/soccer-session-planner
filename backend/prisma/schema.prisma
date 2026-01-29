@@ -1,0 +1,76 @@
+// Prisma schema for Soccer Session Planner
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  name         String
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  
+  drills       Drill[]
+  sessions     Session[]
+
+  @@map("users")
+}
+
+model Drill {
+  id              Int       @id @default(autoincrement())
+  userId          Int       @map("user_id")
+  title           String
+  objective       String?
+  ageGroup        String?   @map("age_group")
+  durationMinutes Int       @map("duration_minutes")
+  notes           String?
+  tags            String[]  @default([])
+  diagramJson     Json?     @map("diagram_json")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionDrills   SessionDrill[]
+
+  @@map("drills")
+}
+
+model Session {
+  id            Int       @id @default(autoincrement())
+  userId        Int       @map("user_id")
+  title         String
+  date          DateTime?
+  team          String?
+  totalDuration Int       @map("total_duration")
+  theme         String?
+  notes         String?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionDrills SessionDrill[]
+
+  @@map("sessions")
+}
+
+model SessionDrill {
+  id               Int       @id @default(autoincrement())
+  sessionId        Int       @map("session_id")
+  drillId          Int       @map("drill_id")
+  order            Int
+  durationOverride Int?      @map("duration_override")
+  sessionNotes     String?   @map("session_notes")
+  
+  session          Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  drill            Drill     @relation(fields: [drillId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, drillId])
+  @@map("session_drills")
+}
