@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild, Input, Output, EventEmitter, signal, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, OnChanges, SimpleChanges, ElementRef, ViewChild, Input, Output, EventEmitter, signal, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -127,7 +127,7 @@ export interface DiagramObject {
     }
   `]
 })
-export class DiagramEditorComponent implements OnInit, AfterViewInit, OnDestroy {
+export class DiagramEditorComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   @ViewChild('container', { static: false }) containerRef!: ElementRef<HTMLDivElement>;
   @Input() initialData?: any;
   @Output() diagramChange = new EventEmitter<any>();
@@ -153,6 +153,22 @@ export class DiagramEditorComponent implements OnInit, AfterViewInit, OnDestroy 
   ngOnInit() {
     if (this.initialData) {
       this.background = this.initialData.background || 'half-pitch';
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['initialData'] && !changes['initialData'].firstChange && this.layer) {
+      // Reload diagram when initialData changes (e.g., when editing existing drill)
+      console.log('InitialData changed, reloading diagram:', changes['initialData'].currentValue);
+      this.background = changes['initialData'].currentValue?.background || 'half-pitch';
+      this.layer.destroyChildren();
+      this.layer.add(this.transformer);
+      this.drawBackground();
+      this.backgroundLayer.draw();
+      if (changes['initialData'].currentValue?.objects) {
+        this.loadDiagram(changes['initialData'].currentValue);
+      }
+      this.layer.draw();
     }
   }
 
