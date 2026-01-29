@@ -12,7 +12,7 @@
 
 ```bash
 # 1. Clone the repository
-git clone <your-repo-url>
+git clone https://github.com/nielspersonal/soccer-session-planner.git
 cd soccer-session-planner
 
 # 2. Install dependencies
