@@ -613,8 +613,59 @@ export class DiagramEditorComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   private loadDiagram(data: any) {
-    // Implementation for loading existing diagram data
-    // This would parse the JSON and recreate the objects
+    if (!data || !data.objects || !Array.isArray(data.objects)) return;
+    
+    // Load each object from the saved data
+    data.objects.forEach((obj: any) => {
+      let shape: Konva.Shape | Konva.Group | null = null;
+      
+      switch (obj.type) {
+        case 'Group':
+          // Recreate player or goal
+          if (obj.children && obj.children.some((c: any) => c.className === 'Circle')) {
+            shape = this.createPlayer({ x: obj.x, y: obj.y });
+          } else {
+            shape = this.createGoal({ x: obj.x, y: obj.y });
+          }
+          break;
+        case 'RegularPolygon':
+          shape = this.createCone({ x: obj.x, y: obj.y });
+          break;
+        case 'Circle':
+          shape = this.createBall({ x: obj.x, y: obj.y });
+          break;
+        case 'Arrow':
+          if (obj.points && obj.points.length >= 4) {
+            shape = new Konva.Arrow({
+              points: obj.points,
+              pointerLength: 10,
+              pointerWidth: 10,
+              fill: obj.fill || '#e74c3c',
+              stroke: obj.stroke || '#e74c3c',
+              strokeWidth: 3,
+            });
+          }
+          break;
+        case 'Rect':
+          shape = new Konva.Rect({
+            x: obj.x,
+            y: obj.y,
+            width: obj.width || 100,
+            height: obj.height || 100,
+            fill: obj.fill || 'rgba(46, 204, 113, 0.2)',
+            stroke: obj.stroke || '#27ae60',
+            strokeWidth: 2,
+            draggable: true,
+          });
+          break;
+      }
+      
+      if (shape) {
+        this.layer.add(shape);
+      }
+    });
+    
+    this.saveState();
   }
 
   getDiagramData(): any {
@@ -631,9 +682,18 @@ export class DiagramEditorComponent implements OnInit, AfterViewInit, OnDestroy 
 
       if (node instanceof Konva.Arrow) {
         obj.points = node.points();
+        obj.fill = node.fill();
+        obj.stroke = node.stroke();
       } else if (node instanceof Konva.Rect) {
         obj.width = node.width();
         obj.height = node.height();
+        obj.fill = node.fill();
+        obj.stroke = node.stroke();
+      } else if (node instanceof Konva.Group) {
+        // Capture children info to distinguish player from goal
+        obj.children = node.children.map(child => ({
+          className: child.getClassName()
+        }));
       }
 
       objects.push(obj);
