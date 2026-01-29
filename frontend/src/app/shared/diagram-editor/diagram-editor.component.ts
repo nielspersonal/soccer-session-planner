@@ -135,7 +135,7 @@ export class DiagramEditorComponent implements OnInit, AfterViewInit, OnDestroy 
   private cdr = inject(ChangeDetectorRef);
 
   selectedTool: ToolType = 'select';
-  background: BackgroundType = 'blank';
+  background: BackgroundType = 'half-pitch';
 
   private stage!: Konva.Stage;
   private layer!: Konva.Layer;
@@ -152,7 +152,7 @@ export class DiagramEditorComponent implements OnInit, AfterViewInit, OnDestroy 
 
   ngOnInit() {
     if (this.initialData) {
-      this.background = this.initialData.background || 'blank';
+      this.background = this.initialData.background || 'half-pitch';
     }
   }
 
@@ -162,6 +162,9 @@ export class DiagramEditorComponent implements OnInit, AfterViewInit, OnDestroy 
       this.initKonva();
       if (this.initialData?.objects) {
         this.loadDiagram(this.initialData);
+      } else {
+        // Emit initial empty diagram with default background
+        this.emitChange();
       }
       this.cdr.detectChanges();
     });
@@ -248,8 +251,14 @@ export class DiagramEditorComponent implements OnInit, AfterViewInit, OnDestroy 
     });
 
     // Save state on any change
-    this.layer.on('dragend', () => this.saveState());
-    this.layer.on('transformend', () => this.saveState());
+    this.layer.on('dragend', () => {
+      this.saveState();
+      this.emitChange();
+    });
+    this.layer.on('transformend', () => {
+      this.saveState();
+      this.emitChange();
+    });
   }
 
   private addObject(type: ToolType, pos: { x: number; y: number }) {
