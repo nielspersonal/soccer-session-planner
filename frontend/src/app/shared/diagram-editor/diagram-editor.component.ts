@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild, Input, Output, EventEmitter, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild, Input, Output, EventEmitter, signal, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -132,6 +132,8 @@ export class DiagramEditorComponent implements OnInit, AfterViewInit, OnDestroy 
   @Input() initialData?: any;
   @Output() diagramChange = new EventEmitter<any>();
 
+  private cdr = inject(ChangeDetectorRef);
+
   selectedTool: ToolType = 'select';
   background: BackgroundType = 'blank';
 
@@ -155,10 +157,14 @@ export class DiagramEditorComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   ngAfterViewInit() {
-    this.initKonva();
-    if (this.initialData?.objects) {
-      this.loadDiagram(this.initialData);
-    }
+    // Use setTimeout to avoid ExpressionChangedAfterItHasBeenCheckedError
+    setTimeout(() => {
+      this.initKonva();
+      if (this.initialData?.objects) {
+        this.loadDiagram(this.initialData);
+      }
+      this.cdr.detectChanges();
+    });
   }
 
   ngOnDestroy() {
