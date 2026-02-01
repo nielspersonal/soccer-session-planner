@@ -71,13 +71,6 @@ export interface DiagramObject {
           </button>
         </div>
 
-        <div class="toolbar-background">
-          <mat-button-toggle-group [(value)]="background" (change)="onBackgroundChange()">
-            <mat-button-toggle value="blank" matTooltip="Blank">Blank</mat-button-toggle>
-            <mat-button-toggle value="half-pitch" matTooltip="Half Pitch">Half</mat-button-toggle>
-            <mat-button-toggle value="full-pitch" matTooltip="Full Pitch">Full</mat-button-toggle>
-          </mat-button-toggle-group>
-        </div>
         </div>
       }
 
@@ -138,7 +131,7 @@ export class DiagramEditorComponent implements OnInit, OnChanges, AfterViewInit,
   private cdr = inject(ChangeDetectorRef);
 
   selectedTool: ToolType = 'select';
-  background: BackgroundType = 'half-pitch';
+  background: BackgroundType = 'half-pitch'; // Fixed to half-pitch only
 
   private stage!: Konva.Stage;
   private layer!: Konva.Layer;
@@ -154,15 +147,14 @@ export class DiagramEditorComponent implements OnInit, OnChanges, AfterViewInit,
   private drawStartPos: { x: number; y: number } | null = null;
 
   ngOnInit() {
-    if (this.initialData) {
-      this.background = this.initialData.background || 'half-pitch';
-    }
+    // Always use half-pitch background
+    this.background = 'half-pitch';
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['initialData'] && !changes['initialData'].firstChange && this.layer) {
-      // Reload diagram when initialData changes (e.g., when editing existing drill)
-      this.background = changes['initialData'].currentValue?.background || 'half-pitch';
+      // Always use half-pitch background
+      this.background = 'half-pitch';
       this.layer.destroyChildren();
       this.layer.add(this.transformer);
       this.drawBackground();

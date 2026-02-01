@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Drill } from './drill.service';
+import { AuthService } from './auth.service';
 
 export interface SessionDrill {
   id: number;
@@ -44,6 +45,7 @@ export interface AddDrillToSessionDto {
 })
 export class SessionService {
   private http = inject(HttpClient);
+  private authService = inject(AuthService);
   private readonly API_URL = '/api/sessions';
 
   getAll(): Observable<Session[]> {
@@ -85,6 +87,7 @@ export class SessionService {
   }
 
   getPrintUrl(sessionId: number): string {
-    return `/api/export/session/${sessionId}/print`;
+    const token = this.authService.getToken();
+    return `/api/export/session/${sessionId}/print?token=${encodeURIComponent(token || '')}`;
   }
 }

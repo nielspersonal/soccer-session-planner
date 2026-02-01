@@ -44,6 +44,10 @@ import { SessionService, Session } from '../../../core/services/session.service'
                 <mat-icon>visibility</mat-icon>
                 View
               </button>
+              <button mat-button (click)="previewSession(session.id)">
+                <mat-icon>preview</mat-icon>
+                Preview
+              </button>
               <button mat-button (click)="exportPDF(session.id)">
                 <mat-icon>picture_as_pdf</mat-icon>
                 PDF
@@ -84,6 +88,11 @@ export class SessionListComponent implements OnInit {
     this.sessionService.getAll().subscribe(sessions => {
       this.sessions = sessions;
     });
+  }
+
+  previewSession(id: number) {
+    const previewUrl = this.sessionService.getPrintUrl(id);
+    window.open(previewUrl, '_blank');
   }
 
   exportPDF(id: number) {

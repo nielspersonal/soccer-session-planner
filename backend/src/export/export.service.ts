@@ -35,28 +35,30 @@ export class ExportService {
   }
 
   generateSessionHTML(session: any): string {
-    const drillsHTML = session.sessionDrills
-      .map((sd: any) => {
-        const duration = sd.durationOverride || sd.drill.durationMinutes;
-        const diagramSVG = this.generateDiagramSVG(sd.drill.diagramJson);
+    const drillsHTML = (session.sessionDrills && session.sessionDrills.length > 0)
+      ? session.sessionDrills
+          .map((sd: any) => {
+            const duration = sd.durationOverride || sd.drill.durationMinutes;
+            const diagramSVG = this.generateDiagramSVG(sd.drill.diagramJson);
 
-        return `
-          <div class="drill" style="page-break-inside: avoid; margin-bottom: 30px; border: 1px solid #ddd; padding: 15px; border-radius: 8px;">
-            <h2 style="margin: 0 0 10px 0; color: #2c3e50;">${sd.drill.title}</h2>
-            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-              <span style="background: #3498db; color: white; padding: 4px 12px; border-radius: 4px; font-size: 14px;">
-                ${duration} min
-              </span>
-              ${sd.drill.ageGroup ? `<span style="background: #9b59b6; color: white; padding: 4px 12px; border-radius: 4px; font-size: 14px;">${sd.drill.ageGroup}</span>` : ''}
-            </div>
-            ${sd.drill.objective ? `<p style="margin: 10px 0;"><strong>Objective:</strong> ${sd.drill.objective}</p>` : ''}
-            ${sd.drill.notes ? `<p style="margin: 10px 0;"><strong>Notes:</strong> ${sd.drill.notes}</p>` : ''}
-            ${sd.sessionNotes ? `<p style="margin: 10px 0; background: #fff3cd; padding: 10px; border-radius: 4px;"><strong>Session Notes:</strong> ${sd.sessionNotes}</p>` : ''}
-            ${diagramSVG ? `<div style="margin-top: 15px; text-align: center;">${diagramSVG}</div>` : ''}
-          </div>
-        `;
-      })
-      .join('');
+            return `
+              <div class="drill" style="page-break-inside: avoid; margin-bottom: 30px; border: 1px solid #ddd; padding: 15px; border-radius: 8px;">
+                <h2 style="margin: 0 0 10px 0; color: #2c3e50;">${sd.drill.title}</h2>
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                  <span style="background: #3498db; color: white; padding: 4px 12px; border-radius: 4px; font-size: 14px;">
+                    ${duration} min
+                  </span>
+                  ${sd.drill.ageGroup ? `<span style="background: #9b59b6; color: white; padding: 4px 12px; border-radius: 4px; font-size: 14px;">${sd.drill.ageGroup}</span>` : ''}
+                </div>
+                ${sd.drill.objective ? `<p style="margin: 10px 0;"><strong>Objective:</strong> ${sd.drill.objective}</p>` : ''}
+                ${sd.drill.notes ? `<p style="margin: 10px 0;"><strong>Notes:</strong> ${sd.drill.notes}</p>` : ''}
+                ${sd.sessionNotes ? `<p style="margin: 10px 0; background: #fff3cd; padding: 10px; border-radius: 4px;"><strong>Session Notes:</strong> ${sd.sessionNotes}</p>` : ''}
+                ${diagramSVG ? `<div style="margin-top: 15px; text-align: center;">${diagramSVG}</div>` : ''}
+              </div>
+            `;
+          })
+          .join('')
+      : '<div style="padding: 40px; text-align: center; color: #999;"><p>No drills added to this session yet.</p></div>';
 
     return `
       <!DOCTYPE html>
@@ -153,13 +155,71 @@ export class ExportService {
   }
 
   private renderHalfPitch(width: number, height: number): string {
+    const pitchWidth = width - 100;
+    const pitchHeight = height - 100;
+    
+    // Penalty area dimensions (18-yard box)
+    const penaltyWidth = pitchWidth * 0.5; // 50% of pitch width
+    const penaltyHeight = pitchHeight * 0.35; // 35% of pitch height
+    
+    // Goal area dimensions (6-yard box)
+    const goalWidth = pitchWidth * 0.25; // 25% of pitch width
+    const goalHeight = pitchHeight * 0.15; // 15% of pitch height
+    
     return `
-      <rect width="${width}" height="${height}" fill="#2ecc71"/>
-      <rect x="0" y="${height / 2 - 80}" width="60" height="160" fill="none" stroke="white" stroke-width="2"/>
+      <rect width="${width}" height="${height}" fill="#7cb342"/>
+      
+      <!-- Pitch outline -->
+      <rect x="50" y="50" width="${pitchWidth}" height="${pitchHeight}" fill="none" stroke="white" stroke-width="3"/>
+      
+      <!-- Center circle (at bottom for half pitch) -->
+      <circle cx="${width / 2}" cy="${height - 50}" r="50" fill="none" stroke="white" stroke-width="3"/>
+      
+      <!-- Penalty area (18-yard box) -->
+      <rect x="${width / 2 - penaltyWidth / 2}" y="50" width="${penaltyWidth}" height="${penaltyHeight}" fill="none" stroke="white" stroke-width="3"/>
+      
+      <!-- Goal area (6-yard box) -->
+      <rect x="${width / 2 - goalWidth / 2}" y="50" width="${goalWidth}" height="${goalHeight}" fill="none" stroke="white" stroke-width="3"/>
+      
+      <!-- Penalty spot -->
+      <circle cx="${width / 2}" cy="${50 + penaltyHeight * 0.65}" r="3" fill="white"/>
     `;
   }
 
   private renderObject(obj: any): string {
+    // Handle Konva.js Group objects (players)
+    if (obj.type === 'Group' && obj.children) {
+      const hasCircle = obj.children.some((child: any) => child.className === 'Circle');
+      const hasText = obj.children.some((child: any) => child.className === 'Text');
+      
+      if (hasCircle && hasText) {
+        return `<circle cx="${obj.x}" cy="${obj.y}" r="15" fill="#3498db" stroke="white" stroke-width="2"/>
+                <text x="${obj.x}" y="${obj.y + 5}" text-anchor="middle" fill="white" font-size="12" font-weight="bold">P</text>`;
+      }
+      return '';
+    }
+    
+    // Handle Konva.js Arrow objects with points array
+    if (obj.type === 'Arrow' && obj.points && obj.points.length >= 4) {
+      const x1 = obj.points[0];
+      const y1 = obj.points[1];
+      const x2 = obj.points[2];
+      const y2 = obj.points[3];
+      
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const angle = Math.atan2(dy, dx);
+      const arrowSize = 10;
+      const arrowX1 = x2 - arrowSize * Math.cos(angle - Math.PI / 6);
+      const arrowY1 = y2 - arrowSize * Math.sin(angle - Math.PI / 6);
+      const arrowX2 = x2 - arrowSize * Math.cos(angle + Math.PI / 6);
+      const arrowY2 = y2 - arrowSize * Math.sin(angle + Math.PI / 6);
+      
+      const color = obj.stroke || obj.fill || '#e74c3c';
+      return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="3"/>
+              <polygon points="${x2},${y2} ${arrowX1},${arrowY1} ${arrowX2},${arrowY2}" fill="${color}"/>`;
+    }
+    
     switch (obj.type) {
       case 'player':
         return `<circle cx="${obj.x}" cy="${obj.y}" r="15" fill="${obj.color || '#3498db'}" stroke="white" stroke-width="2"/>
